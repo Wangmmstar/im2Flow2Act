@@ -41,6 +41,8 @@ def main():
         embodiment_save_path,
         exist_ok=True,
     )
+    print(f"Opening Zarr file at: {data_buffer_path}")
+
     buffer = zarr.open(data_buffer_path)
     for i in tqdm(range(args.viz_num)):
         try:

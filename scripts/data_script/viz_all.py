@@ -5,9 +5,9 @@ import subprocess
 def main():
     dev_path = os.getenv("DEV_PATH")
     viz_pathes = [
-        f"{dev_path}/im2flow2act/data/simulated_play/rigid",
-        f"{dev_path}/im2flow2act/data/simulated_play/articulated",
-        f"{dev_path}/im2flow2act/data/simulated_play/deformable",
+        f"{dev_path}/im2Flow2Act/data/simulated_play/rigid",
+        f"{dev_path}/im2Flow2Act/data/simulated_play/articulated",
+        f"{dev_path}/im2Flow2Act/data/simulated_play/deformable",
     ]
     print(viz_pathes)
     # viz_thresholds = [0]  # use it for viz_bbox for realworld dataset
@@ -31,7 +31,7 @@ def main():
                     "--viz_offset",
                     str(0),
                     "--viz_save_path",
-                    f"{dev_path}/im2flow2act/experiment/visual_pt",
+                    f"{dev_path}/im2Flow2Act/experiment/visual_pt",
                     "--viz_sam",
                     # "--viz_bbox",
                 ],
