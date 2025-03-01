@@ -1,7 +1,7 @@
 import os
 import subprocess
-
-
+#import sys
+# test
 def main():
     dev_path = os.getenv("DEV_PATH")
     viz_pathes = [
