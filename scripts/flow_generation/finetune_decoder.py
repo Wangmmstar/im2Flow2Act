@@ -1,4 +1,7 @@
+# train a VAE learns to encode and decode point tracking sequences for object motion.
+
 import math
+
 import os
 ## test
 os.environ["NCCL_DEBUG"] = "INFO"
@@ -16,6 +19,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from im2flow2act.flow_generation.ae_inference import ae_flow_inference
 
+# hydra load configuration; defines training parameters, dataset paths, and optimizer settings.
 
 @hydra.main(
     version_base=None,
@@ -23,7 +27,7 @@ from im2flow2act.flow_generation.ae_inference import ae_flow_inference
     config_name="finetune_decoder",
 )
 def train(cfg: DictConfig):
-    accelerator = Accelerator(
+    accelerator = Accelerator(  # set multiple GPUS 
         gradient_accumulation_steps=cfg.training.gradient_accumulation_steps
     )
     output_dir = HydraConfig.get().runtime.output_dir
@@ -36,6 +40,7 @@ def train(cfg: DictConfig):
         # state_save_dir = os.path.join(output_dir, "state")
         os.makedirs(ckpt_save_dir, exist_ok=True)
 
+    #fine-tune encoder of pre-trained VAE
     vae = AutoencoderKL.from_pretrained(cfg.pretrained_model_path, subfolder="vae")
     # vae = AutoencoderKL.from_pretrained(cfg.pretrained_model_path)
     # freeze encoder
@@ -183,3 +188,11 @@ def train(cfg: DictConfig):
 
 if __name__ == "__main__":
     train()
+
+"""
+Trains a VAE decoder for flow generation.
+Uses Hydra for config management.
+Runs on multiple GPUs using accelerate.
+Saves model checkpoints for later evaluation.
+Tracks training metrics with wandb.
+"""

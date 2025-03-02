@@ -1,10 +1,13 @@
+#The model learns to predict future flow sequences conditioned on image inputs and keypoints.
+
 import copy
 import gc
 import math
 import os
 
-os.environ["NCCL_DEBUG"] = "INFO"
-os.environ["NCCL_P2P_DISABLE"] = "1"
+os.environ["NCCL_DEBUG"] = "INFO"  #Enables debugging logs for distributed training.
+os.environ["NCCL_P2P_DISABLE"] = "1" #Disables NCCL P2P communication to prevent GPU communication issues.
+
 import random
 
 import hydra
@@ -47,10 +50,12 @@ def cast_training_params(model, dtype=torch.float32):
     config_name="train_flow_generation",
 )
 def train(cfg: DictConfig):
+    #distributed training
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.training.gradient_accumulation_steps
     )
     output_dir = HydraConfig.get().runtime.output_dir
+    #logging
     if accelerator.is_local_main_process:
         wandb.init(project=cfg.project_name)
         wandb.config.update(OmegaConf.to_container(cfg))
@@ -60,22 +65,28 @@ def train(cfg: DictConfig):
         # state_save_dir = os.path.join(output_dir, "state")
         os.makedirs(ckpt_save_dir, exist_ok=True)
         # os.makedirs(state_save_dir, exist_ok=True)
+  
     # Load scheduler, tokenizer and models.
     noise_scheduler = DDIMScheduler(**cfg.noise_scheduler_kwargs)
 
-    vae = AutoencoderKL.from_pretrained(cfg.vae_pretrained_model_path)
-    tokenizer = CLIPTokenizer.from_pretrained(
+    vae = AutoencoderKL.from_pretrained(cfg.vae_pretrained_model_path) #compress image to latent space
+    tokenizer = CLIPTokenizer.from_pretrained(    # converts text prompts into embeddings
         cfg.pretrained_model_path, subfolder="tokenizer"
     )
-    text_encoder = CLIPTextModel.from_pretrained(
+    text_encoder = CLIPTextModel.from_pretrained( #process tokenized text
         cfg.pretrained_model_path, subfolder="text_encoder"
     )
+
+    #Loads a 3D UNet (Conditioned on text) for motion modeling.
+
     unet = UNet3DConditionModel.from_pretrained_2d(
         cfg.pretrained_model_path,
         subfolder="unet",
         unet_additional_kwargs=cfg.unet_additional_kwargs,
         load_pretrain_weight=cfg.training.load_pretrain_weight,
     )
+
+    #Freezes UNet and applies LoRA (low-rank adaptation).  LoRA optimizes only specific attention layers (to_k, to_q, to_v, to_out.0).
 
     # freeze parameters of models to save more memory
     vae.requires_grad_(False)
@@ -99,7 +110,8 @@ def train(cfg: DictConfig):
             param.requires_grad = True
 
     weight_dtype = torch.float32
-    # Move unet, vae and text_encoder to device and cast to weight_dtype
+
+    # Move unet, vae and text_encoder to device and cast to weight_dtype ;  Moves models to GPU and ensures correct precision.
     unet.to(accelerator.device)
     vae.to(accelerator.device)
     text_encoder.to(accelerator.device)
@@ -133,6 +145,9 @@ def train(cfg: DictConfig):
         weight_decay=cfg.optimizer.adam_weight_decay,
         eps=cfg.optimizer.adam_epsilon,
     )
+
+    ########data loading###### Loads training dataset into batches; Uses multiple worker processes to speed up data loading.
+
     dataset = hydra.utils.instantiate(cfg.dataset)
     train_dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -196,6 +211,12 @@ def train(cfg: DictConfig):
     )
     accelerator.print(f"  Total optimization steps = {max_train_steps}")
     # for epoch in range(cfg.training.num_train_epochs):
+
+    """
+    Samples noise, adds noise to latents, and predicts noise using UNet.
+    Uses MSE loss to minimize the difference between model output and noise.
+    Performs backpropagation and optimization.
+    """
     for epoch in range(cfg.training.num_train_epochs):
         model.train()
         epoch_loss = []
@@ -281,6 +302,9 @@ def train(cfg: DictConfig):
                     "epoch": epoch,
                 }
             )
+
+
+        ##### saving model every ckpt_frequency epochs
         if epoch % cfg.training.ckpt_frequency == 0 and epoch > 0 or cfg.debug:
             accelerator.wait_for_everyone()
             if accelerator.is_local_main_process:
@@ -305,6 +329,7 @@ def train(cfg: DictConfig):
                     )
                     accelerator.print(f"Saved checkpoint at epoch {epoch}.")
 
+        ####### EVALUATION ################ evaluate on test datasets
         if epoch % cfg.evaluation.eval_frequency == 0 and epoch > 0 or cfg.debug:
             accelerator.wait_for_everyone()
             accelerator.print(f"Evaluate at epoch {epoch}.")
@@ -339,3 +364,10 @@ def train(cfg: DictConfig):
 
 if __name__ == "__main__":
     train()
+
+"""
+Uses LoRA fine-tuning on a diffusion-based flow-generation model.
+Optimized for multi-GPU training with HuggingFace Accelerate.
+Saves checkpoints and evaluates the model periodically.
+Uses WandB for logging.
+"""
