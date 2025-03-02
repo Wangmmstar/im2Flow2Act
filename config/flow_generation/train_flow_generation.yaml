@@ -2,7 +2,7 @@ dev_dir: ${oc.env:DEV_PATH}
 
 hydra:
   run:
-    dir: ${dev_dir}/im2flow2act/experiment/flow_generation/animateFlow/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${dev_dir}/im2Flow2Act/experiment/flow_generation/animateFlow/${now:%Y-%m-%d_%H-%M-%S}
 
 project_name: AnimateFlow
 debug: False
@@ -41,7 +41,7 @@ lora:
 
 
 vae_pretrained_model_path: path/to/finetune_decoder
-pretrained_model_path: ${oc.env:DEV_PATH}/im2flow2act/pretrain_weights/StableDiffusion1.5
+pretrained_model_path: ${oc.env:DEV_PATH}/im2Flow2Act/pretrain_weights/StableDiffusion1.5
 
 cfg_random_null_text: True
 cfg_random_null_text_ratio: 0.1
@@ -83,9 +83,9 @@ optimizer:
 dataset:
   _target_: im2flow2act.flow_generation.dataloader.animateflow_dataset.AnimateFlowDataset
   data_pathes: [
-    "${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/pickNplace",
-    "${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/pouring",
-    "${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/drawer_open",
+    "${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/pickNplace",
+    "${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/pouring",
+    "${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/drawer_open",
     ]
   grid_size: 32
   frame_sampling_method: "uniform"

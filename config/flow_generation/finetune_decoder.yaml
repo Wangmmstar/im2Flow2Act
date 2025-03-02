@@ -14,8 +14,8 @@ training:
   lr_scheduler: "constant"
   lr_warmup_steps: 0
   # dataloader 
-  batch_size: 1800
-  num_workers: 16
+  batch_size: 900 #1800 original
+  num_workers: 8 #16 original
   shuffle: True
   pin_memory: True
   persistent_workers: True
