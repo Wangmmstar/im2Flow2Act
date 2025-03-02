@@ -1,7 +1,7 @@
 # Im2Flow2Act: 
 **Conference on Robot Learning 2024**
 
-<sup>1,</sup><sup>2,</sup><sup>3</sup>[Mengda Xu](https://mengdaxu.github.io/),  <sup>1,</sup><sup>2,</sup>[Zhenjia Xu](https://www.zhenjiaxu.com/), <sup>1</sup>[Yinghao Xu](https://justimyhxu.github.io/),  <sup>1,</sup><sup>2</sup>[Cheng Chi](https://cheng-chi.github.io/), <sup>1</sup>[Gordon Wetzstein](https://stanford.edu/~gordonwz/), <sup>3,</sup><sup>4</sup>[Manuela Veloso](https://www.cs.cmu.edu/~mmv/),  <sup>1,</sup><sup>2</sup>[Shuran Song](https://shurans.github.io/)
+1234 <sup>1,</sup><sup>2,</sup><sup>3</sup>[Mengda Xu](https://mengdaxu.github.io/),  <sup>1,</sup><sup>2,</sup>[Zhenjia Xu](https://www.zhenjiaxu.com/), <sup>1</sup>[Yinghao Xu](https://justimyhxu.github.io/),  <sup>1,</sup><sup>2</sup>[Cheng Chi](https://cheng-chi.github.io/), <sup>1</sup>[Gordon Wetzstein](https://stanford.edu/~gordonwz/), <sup>3,</sup><sup>4</sup>[Manuela Veloso](https://www.cs.cmu.edu/~mmv/),  <sup>1,</sup><sup>2</sup>[Shuran Song](https://shurans.github.io/)
 
 
 <sup>1</sup>Stanford University, <sup>2</sup>Columbia University,  <sup>3</sup>JP Morgan AI Research,<sup>4</sup>CMU  
