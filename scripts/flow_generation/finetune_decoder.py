@@ -1,6 +1,6 @@
 import math
 import os
-
+## test
 os.environ["NCCL_DEBUG"] = "INFO"
 os.environ["NCCL_P2P_DISABLE"] = "1"
 import hydra
