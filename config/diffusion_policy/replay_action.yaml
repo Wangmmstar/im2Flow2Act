@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: ${oc.env:DEV_PATH}/im2flow2act/replay/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${oc.env:DEV_PATH}/im2Flow2Act/replay/${now:%Y-%m-%d_%H-%M-%S}
 num_processes: 2
 data_buffer_path: /path/to/dataset
 replay_save_path: /path/to/save
