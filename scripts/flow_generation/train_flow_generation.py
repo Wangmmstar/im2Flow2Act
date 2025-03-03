@@ -147,8 +147,9 @@ def train(cfg: DictConfig):
     )
 
     ########data loading###### Loads training dataset into batches; Uses multiple worker processes to speed up data loading.
-
+    accelerator.print("***** Data Loading *****")
     dataset = hydra.utils.instantiate(cfg.dataset)
+    
     train_dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=cfg.training.batch_size,
@@ -158,6 +159,7 @@ def train(cfg: DictConfig):
         persistent_workers=cfg.training.persistent_workers,
         drop_last=cfg.training.drop_last,
     )
+    accelerator.print("***** finish dataloader*****")
     evalulation_datasets = [
         hydra.utils.instantiate(dataset) for dataset in cfg.evaluation.datasets
     ]
