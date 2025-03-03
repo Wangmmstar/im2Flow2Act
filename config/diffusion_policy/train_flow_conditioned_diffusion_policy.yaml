@@ -24,7 +24,7 @@ ema:
 training:
   epochs: 1001
   gradient_accumulation_steps: 1
-  batch_size: 26  #original 52
+  batch_size: 4  #original 52
   num_workers: 1
   shuffle: True
   pin_memory: True
