@@ -40,7 +40,8 @@ lora:
   rank: 128
 
 
-vae_pretrained_model_path: path/to/finetune_decoder
+# vae_pretrained_model_path: path/to/finetune_decoder
+vae_pretrained_model_path: /blue/du.j/mwang5/im2Flow2Act/experiment/flow_generation/finetune_decoder/2025-03-02_16-10-21/checkpoints/epoch_100
 pretrained_model_path: ${oc.env:DEV_PATH}/im2Flow2Act/pretrain_weights/StableDiffusion1.5
 
 cfg_random_null_text: True
@@ -108,7 +109,7 @@ evaluation:
 
   datasets: 
     - _target_: im2flow2act.flow_generation.dataloader.animateflow_dataset.AnimateFlowDataset
-      data_pathes: ["${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/pickNplace"]
+      data_pathes: ["${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/pickNplace"]
       grid_size: 32
       n_sample_frames: ${dataset.n_sample_frames}
       frame_sampling_method: "uniform"
@@ -118,7 +119,7 @@ evaluation:
       max_episode: ${evaluation.num_samples}
       start_episode: 0
     - _target_: im2flow2act.flow_generation.dataloader.animateflow_dataset.AnimateFlowDataset
-      data_pathes: ["${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/pouring"]
+      data_pathes: ["${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/pouring"]
       grid_size: 32
       n_sample_frames: ${dataset.n_sample_frames}
       frame_sampling_method: "uniform"
@@ -128,7 +129,7 @@ evaluation:
       max_episode: ${evaluation.num_samples}
       start_episode: 0
     - _target_: im2flow2act.flow_generation.dataloader.animateflow_dataset.AnimateFlowDataset
-      data_pathes: ["${dev_dir}/im2flow2act/data/simulation_sphere_demonstration/drawer_open"]
+      data_pathes: ["${dev_dir}/im2Flow2Act/data/simulation_sphere_demonstration/drawer_open"]
       grid_size: 32
       n_sample_frames: ${dataset.n_sample_frames}
       frame_sampling_method: "uniform"
