@@ -170,6 +170,8 @@ def train_diffusion_bc(cfg: DictConfig):
                 #Adds noise to actions and predicts denoised actions.
 
                 noisy_actions = noise_scheduler.add_noise(actions, noise, timesteps)
+                #noise_pred: the predicted denoised action; predict_plan:planned trajectory;
+                $ target_plan: ground truth trajectory  proprioception_prediction: predicted proprioception rate
                 noise_pred, predict_plan, target_plan, proprioception_prediction = (
                     model(
                         noisy_actions,
@@ -200,7 +202,8 @@ def train_diffusion_bc(cfg: DictConfig):
                 # diffusion loss
                 action_loss = nn.functional.mse_loss(noise_pred, noise)
 
-                # total loss
+                # total loss: action loss-diffusion-based action prediction; alignment loss: matching predicted vs target trajectory;
+                # proproception loss: ensure physical consistency
                 loss = (
                     action_loss
                     + cfg.alignment_loss_coef * alignment_loss
