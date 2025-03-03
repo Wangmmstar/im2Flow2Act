@@ -1,7 +1,7 @@
 dev_dir: ${oc.env:DEV_PATH}
 hydra:
   run:
-    dir: ${dev_dir}/im2flow2act/experiment/controll/train/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${dev_dir}/im2Flow2Act/experiment/controll/train/${now:%Y-%m-%d_%H-%M-%S}
 
 
 project_name: flow_diffusion_policy
@@ -57,10 +57,10 @@ evaluation:
     eval_store_path: null
   gt_eval_dataset_args: 
     data_dirs: [
-      "${dev_dir}/im2flow2act/data/simulation_evaluation/pickNplace",
-      "${dev_dir}/im2flow2act/data/simulation_evaluation/pouring",
-      "${dev_dir}/im2flow2act/data/simulation_evaluation/drawer_open",
-      "${dev_dir}/im2flow2act/data/simulation_evaluation/folding",
+      "${dev_dir}/im2Flow2Act/data/simulation_evaluation/pickNplace",
+      "${dev_dir}/im2Flow2Act/data/simulation_evaluation/pouring",
+      "${dev_dir}/im2Flow2Act/data/simulation_evaluation/drawer_open",
+      "${dev_dir}/im2Flow2Act/data/simulation_evaluation/folding",
     ]
 
 
@@ -87,9 +87,9 @@ num_warmup_steps: 500
 dataset:
   _target_: im2flow2act.diffusion_policy.dataloader.diffusion_flow_bc_dataset.DiffusionFlowBCCloseLoopDataset
   data_dirs: [
-  "${dev_dir}/im2flow2act/data/simulated_play/rigid",
-  "${dev_dir}/im2flow2act/data/simulated_play/articulated",
-  "${dev_dir}/im2flow2act/data/simulated_play/deformable",
+    "${dev_dir}/im2Flow2Act/data/simulated_play/rigid",
+    "${dev_dir}/im2Flow2Act/data/simulated_play/articulated",
+    "${dev_dir}/im2Flow2Act/data/simulated_play/deformable",
   ]
   point_tracking_img_size: [256,256]
   camera_resize_shape: [224,224]
@@ -118,8 +118,8 @@ dataset:
   herustic_filter: ["right"] 
   load_pointcloud: True
   normalize_pointcloud: True
-  camera_intrinsic_path: ${dev_dir}/im2flow2act/data_local/simulation/instrinsic_5-1.pkl
-  camera_pose_matrix_path: ${dev_dir}/im2flow2act/data_local/simulation/pose_matrix_5-1.pkl
+  camera_intrinsic_path: ${dev_dir}/im2Flow2Act/data_local/simulation/instrinsic_5-1.pkl
+  camera_pose_matrix_path: ${dev_dir}/im2Flow2Act/data_local/simulation/pose_matrix_5-1.pkl
   ignore_robot_mask: False
   depth_noisy_augmentation: False
   gaussian_shifts: [0,0]
