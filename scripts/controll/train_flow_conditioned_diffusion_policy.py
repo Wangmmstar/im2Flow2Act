@@ -20,6 +20,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from im2flow2act.common.utility.model import load_config
 
+#NVIDIA Collective Communications Library
 dist.init_process_group(
     backend="nccl", init_method="env://", timeout=datetime.timedelta(seconds=5400)
 )
@@ -30,6 +31,7 @@ dist.init_process_group(
     config_path="../../config/diffusion_policy",
     config_name="train_flow_conditioned_diffusion_policy",
 )
+# #cfg: DictConfig: This contains all hyperparameters, model paths, dataset paths, and training settings.
 def train_diffusion_bc(cfg: DictConfig):
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.training.gradient_accumulation_steps
