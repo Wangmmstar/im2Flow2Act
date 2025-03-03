@@ -84,13 +84,15 @@ def train_diffusion_bc(cfg: DictConfig):
     sample_batch = next(iter(dataloader))
     for k, v in sample_batch.items():
         accelerator.print(k, v.shape)
+    
+    #Initializing Model and Optimizer
 
     model = hydra.utils.instantiate(cfg.model)
     noise_scheduler = hydra.utils.instantiate(cfg.noise_scheduler)
     optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
     num_update_steps_per_epoch = len(dataloader)
     max_train_steps = cfg.training.epochs * num_update_steps_per_epoch
-    lr_scheduler = get_scheduler(
+    lr_scheduler = get_scheduler(#learning rate scheduler
         cfg.lr_scheduler,
         optimizer=optimizer,
         num_warmup_steps=cfg.num_warmup_steps * accelerator.num_processes,
@@ -153,6 +155,8 @@ def train_diffusion_bc(cfg: DictConfig):
                 actions = actions.to(accelerator.device)
                 target_flows = target_flows.to(accelerator.device)
                 point_clouds = point_clouds.to(accelerator.device)
+                #Loads batch data onto the device.
+                #Generates random noise for diffusion training.
                 noise = torch.randn(actions.shape, device=accelerator.device)
                 bsz = flows.shape[0]
                 timesteps = torch.randint(
@@ -161,6 +165,10 @@ def train_diffusion_bc(cfg: DictConfig):
                     (bsz,),
                     device=accelerator.device,
                 ).long()
+
+                
+                #Adds noise to actions and predicts denoised actions.
+
                 noisy_actions = noise_scheduler.add_noise(actions, noise, timesteps)
                 noise_pred, predict_plan, target_plan, proprioception_prediction = (
                     model(
@@ -199,11 +207,12 @@ def train_diffusion_bc(cfg: DictConfig):
                     + cfg.proprioception_loss_coef * proprioception_loss
                 )
 
-                # optimize
+                # optimize; backpropagation
                 optimizer.zero_grad()
                 accelerator.backward(loss)
                 lr_scheduler.step()
                 optimizer.step()
+                
                 # update ema
                 if cfg.training.use_ema:
                     ema.step(accelerator.unwrap_model(model))
@@ -226,7 +235,8 @@ def train_diffusion_bc(cfg: DictConfig):
                     "epoch_proprioception_loss": np.mean(epoch_proprioception_loss),
                 }
             )
-        if epoch % cfg.training.ckpt_frequency == 0 and epoch > 0:
+        if epoch % cfg.training.ckpt_frequency == 0 and epoch > 0: #Saves model every ckpt_frequency epochs.
+
             accelerator.wait_for_everyone()
             if accelerator.is_local_main_process:
                 ckpt_model = accelerator.unwrap_model(model)
@@ -246,7 +256,7 @@ def train_diffusion_bc(cfg: DictConfig):
                     output_dir=os.path.join(state_save_dir, f"epoch_{epoch}")
                 )
                 accelerator.print(f"Saved state checkpoint at epoch {epoch}.")
-
+        #run evaluation at given intervals
         if (
             accelerator.is_local_main_process
             and epoch % cfg.evaluation.eval_frequency == 0
@@ -270,3 +280,12 @@ def train_diffusion_bc(cfg: DictConfig):
 
 if __name__ == "__main__":
     train_diffusion_bc()
+
+"""
+ Loads configurations using Hydra.
+✔ Initializes model, dataset, optimizer, and scheduler.
+✔ Trains a flow-conditioned diffusion model for robotic manipulation.
+✔ Uses multi-GPU training (Accelerate, NCCL).
+✔ Saves checkpoints and logs losses to wandb.
+✔ Evaluates periodically.
+"""
