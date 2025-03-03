@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: ${oc.env:DEV_PATH}/im2flow2act/experiment/dataset_generation/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${oc.env:DEV_PATH}/im2Flow2Act/experiment/dataset_generation/${now:%Y-%m-%d_%H-%M-%S}
 
 data_buffer_path: null
 camera_id: 0
