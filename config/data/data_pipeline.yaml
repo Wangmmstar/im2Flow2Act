@@ -3,17 +3,20 @@ hydra:
     dir: ${oc.env:DEV_PATH}/im2Flow2Act/experiment/dataset_generation/${now:%Y-%m-%d_%H-%M-%S}
 
 avaliable_gpu: [0,1,2,3]
-data_buffer_path: /path/to/data_buffer
-store_path: /path/to/store
-dataset: dataset_name
+data_buffer_path: /path/to/data_buffer  #Set this to your raw dataset directory.
+
+store_path: /path/to/store   #Set this to where the processed dataset should be saved.
+
+dataset: dataset_name   #Set this to your dataset name.
+
 downsample_ratio: 2
 n_sample_frame: null # half of the max frames
 num_points: 20 
 from_bbox: False
 point_move_thresholds: 20  
 from_grid: False 
-simulation_herustic_filter: [] 
+simulation_herustic_filter: []   #Add specific filtering conditions if needed.
 
 zero_robot_mask: False  
-simulation_herustic: False 
+simulation_herustic: False   #Set to True if using heuristic-based filtering.
 simulation_herustic_patial: True 
