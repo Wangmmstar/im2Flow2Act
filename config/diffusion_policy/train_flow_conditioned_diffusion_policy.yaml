@@ -1,7 +1,7 @@
 dev_dir: ${oc.env:DEV_PATH}
 hydra:
   run:
-    dir: ${dev_dir}/im2Flow2Act/experiment/controll/train/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${dev_dir}/im2Flow2Act/experiment/controll/train/${now:%Y-%m-%d_%H-%M-%S}   # store path
 
 
 project_name: flow_diffusion_policy
