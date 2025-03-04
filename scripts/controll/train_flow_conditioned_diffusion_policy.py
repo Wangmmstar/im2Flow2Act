@@ -171,7 +171,7 @@ def train_diffusion_bc(cfg: DictConfig):
 
                 noisy_actions = noise_scheduler.add_noise(actions, noise, timesteps)
                 #noise_pred: the predicted denoised action; predict_plan:planned trajectory;
-                $ target_plan: ground truth trajectory  proprioception_prediction: predicted proprioception rate
+                #target_plan: ground truth trajectory  proprioception_prediction: predicted proprioception rate
                 noise_pred, predict_plan, target_plan, proprioception_prediction = (
                     model(
                         noisy_actions,
