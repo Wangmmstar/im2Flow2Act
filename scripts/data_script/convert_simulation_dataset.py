@@ -1,3 +1,20 @@
+
+#  Input:
+# Raw Simulation Dataset (data_buffer_path)
+# Images (camera_X/rgb)
+# Metadata (info/task_description)
+
+
+#  Output Files
+# Processed Dataset (store_path):
+# Format: Zarr file
+# Contains:
+# RGB images (rgb_arr)
+# Sample frame indices (sample_indices)
+# Task descriptions (task_description) (if enabled)
+
+
+
 import os
 
 import cv2
