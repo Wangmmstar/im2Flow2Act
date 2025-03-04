@@ -3,9 +3,9 @@ hydra:
     dir: ${oc.env:DEV_PATH}/im2Flow2Act/experiment/dataset_generation/${now:%Y-%m-%d_%H-%M-%S}
 
 avaliable_gpu: [0]
-buffer_path: /path/to/data_buffer
-episode_start: null
+buffer_path: /path/to/data_buffer    # (where the data is stored).
+episode_start: null    # (which episodes to process).
 episode_end: null
 # object: ["blue cube.","drawer."] # red drawer; checker cloth
-object: ["red mug."] # red drawer; checker cloth
+object: ["red mug."] # red drawer; checker cloth    #  (text descriptions for Grounding DINO).
 
