@@ -20,6 +20,8 @@ from im2flow2act.diffusion_policy.utility.evaluation import (
     config_path="../../config/diffusion_policy",
     config_name="evaluate_flow_diffusion_policy",
 )
+
+
 def eval(cfg):
     model_cfg = load_config(cfg.model_path)
     model, noise_scheduler = load_flow_diffusion_model(
@@ -38,6 +40,8 @@ def eval(cfg):
         optional_transforms=[],
         **gt_dataset_args,
     )
+    print("Model Path:", cfg.model_path)
+
     gt_data_buffers = [
         zarr.open(data_dir, mode="r") for data_dir in gt_eval_dataset.data_dirs
     ]

@@ -32,7 +32,8 @@ dist.init_process_group(
     config_name="train_flow_conditioned_diffusion_policy",
 )
 # #cfg: DictConfig: This contains all hyperparameters, model paths, dataset paths, and training settings.
-def train_diffusion_bc(cfg: DictConfig):
+def train_diffusion_bc(cfg: DictConfig): #Main training loop: loads dataset, trains model, and saves checkpoints.
+
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.training.gradient_accumulation_steps
     )
@@ -57,7 +58,7 @@ def train_diffusion_bc(cfg: DictConfig):
         os.makedirs(state_save_dir, exist_ok=True)
 
     # max_episode = 5 if cfg.debug else cfg.dataset.max_episode
-    dataset = hydra.utils.instantiate(
+    dataset = hydra.utils.instantiate(  #Loads dataset and creates dataloader.
         cfg.dataset, max_episode=5 if cfg.debug else cfg.dataset.max_episode
     )
     print("Total training samples:", len(dataset))
@@ -87,9 +88,11 @@ def train_diffusion_bc(cfg: DictConfig):
     
     #Initializing Model and Optimizer
 
-    model = hydra.utils.instantiate(cfg.model)
+    model = hydra.utils.instantiate(cfg.model)  #    #Initializing Model and Optimizer
+
     noise_scheduler = hydra.utils.instantiate(cfg.noise_scheduler)
-    optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters())
+    optimizer = hydra.utils.instantiate(cfg.optimizer, params=model.parameters()) #Sets up AdamW optimizer.
+
     num_update_steps_per_epoch = len(dataloader)
     max_train_steps = cfg.training.epochs * num_update_steps_per_epoch
     lr_scheduler = get_scheduler(#learning rate scheduler
