@@ -32,6 +32,13 @@ def eval(cfg):
             "generated_flow",
         )
         os.makedirs(gt_result_save_path, exist_ok=True)
+        
+        # Calls evaluate_flow_diffusion_policy_from_generated_flow, which:
+        # Generates motion flows for evaluation.
+        # Evaluates robot actions based on these flows.
+        # Compares predicted actions with expected outputs.
+        # Saves results to evaluation/epoch_300/generated_flow.
+                
         evaluate_flow_diffusion_policy_from_generated_flow(
             model=model,
             noise_scheduler=noise_scheduler,
