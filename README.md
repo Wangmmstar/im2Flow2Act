@@ -96,7 +96,7 @@ Train the flow generation model based on [Animatediff](https://animatediff.githu
 ```bash
 accelerate launch train_flow_generation.py
 ```
-The model will be evaluated every 200 epochs and the results will be logged by Weights&Biases. Additionally, we log the generated flow and ground truth flow under `experiment/flow_generation/yyyy-mm-dd-ss/evaluations/epoch_x`:
+The model will be luated every 200 epochs and the results will be logged by Weights&Biases. Additionally, we log the generated flow and ground truth flow under `experiment/flow_generation/yyyy-mm-dd-ss/luations/epoch_x`:
 ```bash
 dataset_0
 ├── generated_flow_0.gif
@@ -108,7 +108,7 @@ To train the policy:
 ```bash
 accelerate launch train_flow_conditioned_diffusion_policy.py
 ```
-During the training, the policy will be evaluated every 100 epochs with ground truth flow. You can change the frequency by modifying `training.ckpt_frequency` in the config file. You will need a gpu with at least 24GB memory to run the online point tracking and policy inference at the same time. The evaluation results will be saved at the policy folder:
+During the training, the policy will be luated every 100 epochs with ground truth flow. You can change the frequency by modifying `training.ckpt_frequency` in the config file. You will need a gpu with at least 24GB memory to run the online point tracking and policy inference at the same time. The luation results will be saved at the policy folder:
 ```bash
 .
 ├── episode_0
@@ -131,12 +131,12 @@ During the training, the policy will be evaluated every 100 epochs with ground t
 
 
 
-<a name="Evaluation"></a>
-## 🏂 Evaluation
+<a name="luation"></a>
+## 🏂 luation
 ### Evaluate Manipulation Policy
 You can directly evaluate the trained policy by 
 ```bash
-python evalute_flow_diffusion_policy.py
+python evaluate_flow_diffusion_policy.py
 ```
 The quantitative results are stored in `success_count.json`. Notice, for cloth folding, you need to manully inspect the results.  
 ### Evaluate Complete System
