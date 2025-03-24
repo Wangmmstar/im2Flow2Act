@@ -112,7 +112,7 @@ def process_env_visual_observation(visual_observation, resize_shape):
     return visual_observation
 
 
-def evaluate_flow_diffusion_policy(
+def evaluate_flow_diffusion_policy( ## evaluate diffusion policy using flow data computed from dataset 
     model,
     noise_scheduler,
     num_inference_steps,
@@ -201,6 +201,9 @@ def evaluate_flow_diffusion_policy(
             )
             initial_flow_depth = initial_flow.copy()
             initial_flow = torch.tensor(initial_flow).unsqueeze(0).cuda()
+
+            #### proces episode point tracking data to generate episode flow plan: flow states sequence
+            
             eval_dataset.sampling_type = "uniform"
             if eval_dataset.sampling_type == "random":
                 episode_flow_plan, episode_plan_indices = random_sampling(
@@ -257,6 +260,8 @@ def evaluate_flow_diffusion_policy(
                 cam_pose=eval_dataset.camera_pose_matrix,
                 flow=None,
             )
+
+            ## save point clouds from depth and visual, two type: debugging and visualizing
             meshwrite(
                 filename=os.path.join(
                     os.path.join(buffer_result_save_path, f"episode_{i}_debug_pts.ply")
@@ -282,6 +287,8 @@ def evaluate_flow_diffusion_policy(
             if eval_dataset.normalize_pointcloud:
                 point_clouds = eval_dataset.normalize_point_cloud(point_clouds)
             point_clouds = torch.tensor(point_clouds).unsqueeze(0).cuda()
+
+            ### deque --- maintain history of visual and proprioception
 
             img_obs_deque_0 = collections.deque(
                 [
@@ -353,6 +360,12 @@ def evaluate_flow_diffusion_policy(
                 torch.tensor(current_flow[:, 0, :]).cuda().unsqueeze(0)
             )  # (1,N,3)
             target_flow = torch.zeros((1, eval_dataset.target_flow_horizon))
+
+            ## starting random noise as input
+            ### iteratively refine the predicted action sequence using diffusion model and noise scheduler
+            ### input: current obsearvations, initial frame, proprioceptive data, flow plan, point clouds
+            #### predict actions and then unnormalize and apply to the enviornment (env.step())
+            
             for step in range(20):
                 prop_seq = (
                     torch.from_numpy(np.concatenate(prop_deque, axis=0))
@@ -449,10 +462,10 @@ def evaluate_flow_diffusion_policy(
                     success_count += 1
                     break
 
-            env.flush()
+            env.flush()  ## save envionmnt simulation data recording
             online_point_tracking = np.concatenate(online_point_tracking, axis=1)
             point_tracking_viz_frames = np.array(point_tracking_viz_frames)
-            viz_point_tracking_flow(
+            viz_point_tracking_flow( ## function save GIF
                 point_tracking_viz_frames,
                 online_point_tracking.copy(),
                 point_per_key=len(online_point_tracking),
@@ -480,6 +493,9 @@ def evaluate_flow_diffusion_policy(
     with open(os.path.join(result_save_path, "success_count.json"), "w") as f:
         json.dump(success_count_dict, f)
 
+## simular to above function but use a flow geenrator to produce flow data insetead of relying solely on pre-computed point tracking data
+### For each episode, the generator produces a flow from the current RGB image and depth image. It also saves a GIF showing the generated flow.
+## once flow is available, then construct query points, generate point clouds, running the diffusion model to predict actions, stepping the environment, saving results.
 
 def evaluate_flow_diffusion_policy_from_generated_flow(
     model,
@@ -805,6 +821,8 @@ def evaluate_flow_diffusion_policy_from_generated_flow(
         json.dump(success_count_dict, f)
 
 
+## replay stored action in dataset, 1. build environment, retrieve the stored actions, apply each action sequentially env.step()
+
 def replay_action(replay_offset, num_samples, env_cfg, data_buffer, result_save_path):
     env_cfg.eval_store_path = result_save_path
     for i in tqdm(range(replay_offset, replay_offset + num_samples)):
@@ -819,7 +837,7 @@ def replay_action(replay_offset, num_samples, env_cfg, data_buffer, result_save_
         for j in range(action_len):
             action = episode_actions[j]
             obs, reward, done, _, info = env.step(action)
-        env.flush(store_eps=i)
+        env.flush(store_eps=i)  ## store simulation results
 
 
 def render_depth(num_samples, env_cfg, data_buffer):
