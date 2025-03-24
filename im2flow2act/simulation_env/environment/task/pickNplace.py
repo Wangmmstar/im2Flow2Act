@@ -202,3 +202,121 @@ class PickNPlace(TableTopUR5WSG50FinrayEnv):
         for k, v in object_link_state.items():
             object_links_quat.append(v.pose.orientation)
         return quat2euler(object_links_quat[-1].astype(np.float32))
+
+
+
+###################### FACTORY #####################################
+
+class FactoryPickAndPlace(TableTopUR5WSG50FinrayEnv):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.task_description = "Pick up the wood panel and place it onto the conveyor belt."
+        # Set any new action or workspace limits if needed
+        # e.g., self.action_x_lower_bound, etc.
+
+    def setup_model(self):
+        # Override the world model to load a factory scene instead of a table scene.
+        # For example, use a new XML file that describes the factory environment.
+        world_model = mjcf.from_path(
+            os.path.normpath(os.path.join(file_dir, "asset/custom/factory.xml"))
+        )
+        # Optionally add additional lighting or background modifications here.
+        
+        # Attach the robot model as before.
+        robot_model = mjcf.from_path(
+            os.path.normpath(
+                os.path.join(
+                    file_dir, "asset/mujoco_menagerie/universal_robots_ur5e/ur5e.xml"
+                )
+            )
+        )
+        # Remove any keyframes or adjust if necessary.
+        del robot_model.keyframe
+        # Add the robot model to the world model (similar to the original code).
+        robot_site = world_model.worldbody.add(
+            "site",
+            name="robot_site",
+            pos=(0.0, 0.0, 0),
+            quat=R.from_euler("z", np.pi / 2).as_quat()[[3, 0, 1, 2]],
+        )
+        robot_site.attach(robot_model)
+        return world_model
+
+    def setup_objs(self, world_model):
+        # Define bounds where the wood panel and conveyor are placed.
+        wood_panel_x_bound = [0.4, 0.7]
+        wood_panel_y_bound = [-0.2, 0.0]
+        conveyor_x_bound = [0.7, 1.0]
+        conveyor_y_bound = [0.1, 0.3]
+
+        wood_panel_pos = (
+            np.random.uniform(*wood_panel_x_bound),
+            np.random.uniform(*wood_panel_y_bound),
+            0.01,  # Adjust height based on the wood panel dimensions
+        )
+        target_pos = (
+            np.random.uniform(*conveyor_x_bound),
+            np.random.uniform(*conveyor_y_bound),
+            0.01,  # Target height on the conveyor belt
+        )
+        # Ensure there is enough separation between initial and target positions.
+        while self.is_overlapping(wood_panel_pos, target_pos, min_distance=0.2):
+            wood_panel_pos = (
+                np.random.uniform(*wood_panel_x_bound),
+                np.random.uniform(*wood_panel_y_bound),
+                0.01,
+            )
+            target_pos = (
+                np.random.uniform(*conveyor_x_bound),
+                np.random.uniform(*conveyor_y_bound),
+                0.01,
+            )
+        self.target_pos = target_pos
+
+        # Load the wood panel model. Replace the asset path with your wood panel asset.
+        wood_panel_model = mjcf.from_path(
+            os.path.normpath(
+                os.path.join(
+                    file_dir,
+                    "../mujoco/asset/wood_panel/model.xml"  # New asset file for the wood panel
+                )
+            )
+        )
+        wood_panel_model.model = "wood_panel"
+        self.add_obj_from_model(
+            world_model,
+            wood_panel_model,
+            wood_panel_pos,
+            quat=R.from_euler("z", 0).as_quat()[[3, 0, 1, 2]],
+            add_freejoint=True,
+        )
+
+        # Load the conveyor belt model. This could be a static object that serves as the target.
+        conveyor_model = mjcf.from_path(
+            os.path.normpath(
+                os.path.join(
+                    file_dir,
+                    "../mujoco/asset/conveyor/model.xml"  # New asset file for the conveyor belt
+                )
+            )
+        )
+        conveyor_model.model = "conveyor"
+        self.add_obj_from_model(
+            world_model,
+            conveyor_model,
+            target_pos,  # Place it at the target position or at a fixed location defined in your model
+            add_freejoint=False,  # Depending on whether the conveyor should move or remain static
+        )
+
+        # You can decide which object is selected for manipulation.
+        self.selected_object = "wood_panel"
+
+    def is_overlapping(self, obj1_pos, obj2_pos, min_distance=0.2):
+        # Similar to the original check, but you can adjust the minimum distance.
+        x1, y1, _ = obj1_pos
+        x2, y2, _ = obj2_pos
+        return np.linalg.norm((x1 - x2, y1 - y2)) <= min_distance
+
+    # You might need to override other methods (like step, get_observation, etc.)
+    # if the factory environment has additional requirements.
+
