@@ -1,3 +1,16 @@
+"""
+In the first function (evaluate_flow_diffusion_policy), the "flow" comes from data already stored in the evaluation dataset. 
+The dataset provides pre-recorded point tracking data (e.g., episode_point_tracking) which is then processed—using methods 
+like normalization and different sampling strategies—to generate an initial flow plan for the episode.
+
+In contrast, in the second function (evaluate_flow_diffusion_policy_from_generated_flow),
+a flow generator is instantiated (via the FlowGenerator class) that generates flow on the fly. 
+Here, the flow generator takes current observations (RGB images and depth) from the simulation environment and computes the flow immediately during evaluation. 
+The generated flow is then used in the same downstream diffusion process. 
+So while the first function relies on pre-recorded and processed flow data, the second actively calls a flow generation model during evaluation rather than loading pre-computed flow.
+"""
+
+
 import collections
 import json
 import os
